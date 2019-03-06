@@ -1,5 +1,7 @@
 class CalcController {
     constructor() {
+        this._audio = new Audio('click.mp3');
+        this._audioOnOff = false;
         this._lastOperator = '';
         this._lastNumber = '';
         this._operation = [];
@@ -12,8 +14,28 @@ class CalcController {
         this.initButtonsEvents();
         this.initKeyboard();
     }
+    pasteFromClipboard(){
+        document.addEventListener('paste',e=>{
+            let text = e.clipboardData.getData('Text');
+            this.displayCalc = parseFloat(text);
+        });
+    }
+    copyToClipboard(){
+        //Cria um elemento HTML dinâmicamente com Javascript 
+        let input = document.createElement('input');
+        input.value = this.displayCalc;
+        //Adiciona o elemento input ao body do documento HTML com um elemento filho
+        document.body.appendChild(input);
+        //Permite selecionar o conteúdo do input para a área de transferência
+        input.select();
+        //Habilita o copiar
+        document.execCommand("Copy");
+        //Remove o input
+        input.remove();
+    }
     initKeyboard(){
         document.addEventListener('keyup', e=>{
+            this.playAudio();
             switch (e.key) {
                 case "Escape":
                     this.clearAll();
@@ -27,9 +49,6 @@ class CalcController {
                 case "*":
                 case "%":
                     this.addOperation(e.key);
-                    break;
-                case "porcento":
-                    this.addOperation('%');
                     break;
                 case "Enter":
                 case "=":
@@ -51,6 +70,10 @@ class CalcController {
                 case '9':
                     this.addOperation(parseInt(e.key));
                     break;
+                case 'c':
+                    if(e.ctrlKey)
+                        this.copyToClipboard();
+                    break;
             }
         });
     }
@@ -67,6 +90,21 @@ class CalcController {
             clearInterval(interval);
         },10000);*/
         this.setLastNumberToDisplay();
+        this.pasteFromClipboard();
+        document.querySelectorAll('.btn-ac').forEach(btn=>{
+            btn.addEventListener('dblclick',e=>{
+                this.toggleAudio();
+            });
+        });
+    }
+    toggleAudio(){
+        this._audioOnOff = !this._audioOnOff;
+    }
+    playAudio(){
+        if(this._audioOnOff){
+            this._audio.currentTime = 0;
+            this._audio.play();
+        }
     }
     addEventListenerAll(element, events, fn) {
         //Elements é uma String e split separa em um vetor de elementos pelo espaço
@@ -193,6 +231,7 @@ class CalcController {
         this.setLastNumberToDisplay();
     }
     execBtn(value) {
+        this.playAudio();
         switch (value) {
             case "ac":
                 this.clearAll();
