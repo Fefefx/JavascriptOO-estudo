@@ -9,9 +9,7 @@ var photo = document.querySelector("#exampleInputFile");
 var admin = document.querySelector("#exampleInputAdmin");
 */
 //Seleciona todos os campos do formulário que possuem atributo name
-var fields = document.querySelectorAll("#form-user-create [name]");
-
-var user = {};
+//var fields = document.querySelectorAll("#form-user-create [name]");
 
 /*document.querySelectorAll("button").forEach(function(){
 	this.addEventListener("click",function(){
@@ -19,19 +17,7 @@ var user = {};
 	});
 });*/
 
-document.getElementById("form-user-create").addEventListener("submit",function(event){
-	//Cancela o evento pdrão do elemento no caso o submit
-	//Ideal para Single Page Aplication (SPA)
-	event.preventDefault();
-	fields.forEach(function(field, index){
-		if(field.name == "gender"){
-			if(field.checked)
-				user[field.name] = field.value;
-		}else{
-				/*Define a chave do objeto user como sendo o nome do campo
-				 e atribui o valor como propriedade da chave. */
-				user[field.name] = field.value;
-		}
-	});
-	console.log(user);
-});
+let userController = new UserController("form-user-create","table-users");
+
+
+
