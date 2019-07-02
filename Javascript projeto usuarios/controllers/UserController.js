@@ -16,6 +16,8 @@ class UserController{
 			//Desabilita o botão
 			btn.disabled = true;
 			let values = this.getValues();
+			//Caso values seja falso cancela o evento.
+			if(!values) return false;
 			/*Invoca a promise */
 			this.getPhoto().then(
 				//Parâmetro resolve
@@ -40,7 +42,7 @@ class UserController{
 
 	getPhoto(){
 		/*Define uma promessa para uma ação assíncrona (no caso o carregamento da imagem). 
-		  Se a tudo der certo, executa a ação especificada pelo parâmetro resolve, senão 
+		  Se tudo der certo, executa a ação especificada pelo parâmetro resolve, senão 
 		  executa a ação do parâmetro reject.*/
 		return new Promise((resolve,reject)=>{
 			let fileReader = new FileReader();
@@ -68,15 +70,23 @@ class UserController{
 
 	getValues(){		
 		let user = {};
+		let isValid = true;
 		/*Os cochetes definem o elemento como um Array e a reticências (Spread) 
 		  define que sejam pegos todos os elementos sem que precise especificar
 		  o índice.*/ 
 		[...this.formEl.elements].forEach(function(field, index){
+			//Verifica se o campo está dentro do vetor e se o conteúdo dele é vazio.
+			if(["name","email","password"].indexOf(field.name) > -1 && !field.value){
+				/* Acessa o elemento pai do campo e adiciona as classes  
+				   dele a propriedade CSS has-error. */
+				field.parentElement.classList.add("has-error");
+				isValid = false;
+			}
 			if(field.name == "gender"){
 				if(field.checked)
 					user[field.name] = field.value;
 			}else if(field.name == "admin"){
-				//Captura um booleano indicando se a checkbox está checada ou não
+				//Captura um booleano indicando se a checkbox está checada ou não.
 				user[field.name] = field.checked;
 			}else{
 					/*Define a chave do objeto user como sendo o nome do campo
@@ -84,6 +94,10 @@ class UserController{
 					user[field.name] = field.value;
 			}
 		});
+		//Se o formulário não estiver válido interrompe a execução do método.
+		if(!isValid){
+			return false;
+		}
 		return new User(user.name,
 			user.gender,
 			user.birth,
@@ -96,6 +110,10 @@ class UserController{
 
 	addLine(dataUser){
 		let tr = document.createElement("tr");
+		/* A API dataset permite recuperar um valor como um objeto 
+		   e o método stringify converte seu conteúdo para String JSON,
+		   em um processo conhecido como Serialização. */
+		tr.dataset.user = JSON.stringify(dataUser);
 		tr.innerHTML = `<tr>
                     <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
                     <td>${dataUser.name}</td>
@@ -109,6 +127,20 @@ class UserController{
                   </tr>`;
         //Adiciona um elemento filho a outro sem substituir o conteúdo já existente.
         this.tableEl.appendChild(tr);
+        this.updateCount();
+	}
+
+	updateCount(){
+		let numberUsers = 0;
+		let numberAdmin = 0;
+		[...this.tableEl.children].forEach(tr=>{
+			numberUsers++;
+			//O método parse transforma a String JSON em um objeto JSON manipulável.
+			let user = JSON.parse(tr.dataset.user);
+			if(user._admin) numberAdmin++;
+		});
+		document.querySelector("#number-users").innerHTML = numberUsers;
+		document.querySelector("#number-users-admin").innerHTML = numberAdmin;
 	}
 
 }
