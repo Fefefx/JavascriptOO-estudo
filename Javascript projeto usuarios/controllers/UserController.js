@@ -4,6 +4,15 @@ class UserController{
 		this.formEl = document.getElementById(formId);
 		this.tableEl = document.getElementById(tableId);
 		this.onSubmit();
+		this.onEdit();
+	}
+
+	onEdit(){
+		/*Localiza o elemento que tenha a classe btn-cancel dentro do elemento de id
+		  box-user-update.*/ 
+		document.querySelector("#box-user-update .btn-cancel").addEventListener("click",e=>{
+			this.showPanelCreate();
+		});
 	}
 
 	onSubmit(){
@@ -121,13 +130,59 @@ class UserController{
                     <td>${(dataUser.admin)?'Sim':'Não'}</td>
                     <td>${Utils.dateFormat(dataUser.register)}</td>
                     <td>
-                      <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+                      <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                       <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
                     </td>
                   </tr>`;
+        tr.querySelector(".btn-edit").addEventListener("click",e=>{
+        	let json = JSON.parse(tr.dataset.user);
+        	let form = document.querySelector("#form-user-update");
+        	//O laço For in percorre cada elemento do JSON
+        	for(name in json){
+        		/*Seleciona o campo cujo name seja igual ao valor do Json,
+        		  utilizando o replace para tirar o underline do elemento.*/
+        		let field = form.querySelector("[name = "+name.replace("_","")+"]");
+        		//Verifica se encontrou o campo
+        		if(field){
+        			switch(field.type){
+        				/*Como o campo arquivo não possui value o continue 
+        			  	  pula para a próxima interação.*/
+        				case 'file':
+        					continue;
+        				break;
+        				/*No caso do componente Radio seleciona somente o campo 
+        				  que tenha value igual ao do JSON.*/
+        				case 'radio':
+        					field = form.querySelector("[name = "+name.replace("_","")+"][value="+json[name]+"]");
+        					field.checked = true;
+        				break;
+        				//Verifica o valor da chave do JSON para marcar ou não a checkbox.
+        				case 'checkbox':
+        					field.checked = json[name];
+        				break;
+        				default:
+        					/*O valor do campo selecionado recebe a propriedade relacionada 
+        			  		  com a chave name da presente interação.*/
+        					field.value = json[name];
+        			}
+        		}
+        	}
+        	this.showPanelUpdate();
+        });
         //Adiciona um elemento filho a outro sem substituir o conteúdo já existente.
         this.tableEl.appendChild(tr);
         this.updateCount();
+	}
+
+	showPanelCreate(){
+       	document.querySelector("#box-user-create").style.display = "block";
+       	document.querySelector("#box-user-update").style.display = "none";
+	}
+
+	showPanelUpdate(){
+	   	//Oculta o formulário de inserção e mostra o de alteração.
+       	document.querySelector("#box-user-create").style.display = "none";
+       	document.querySelector("#box-user-update").style.display = "block";
 	}
 
 	updateCount(){
