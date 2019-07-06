@@ -6,6 +6,7 @@ class UserController{
 		this.tableEl = document.getElementById(tableId);
 		this.onSubmit();
 		this.onEdit();
+		this.selectAll();
 	}
 
 	onEdit(){
@@ -87,6 +88,7 @@ class UserController{
 				  pois elas mudam o escopo.*/
 				(content)=>{
 					values.photo = content;
+					this.insert(values);
 					this.addLine(values);
 					//Limpa os campos do formulário
 					this.formEl.reset();
@@ -168,6 +170,41 @@ class UserController{
 			user.password,
 			user.photo,
 			user.admin);
+	}
+
+	getUsersStorage(){
+		let users = [];
+		/*Se existir uma string com os dados dos usuários
+		  carrega os mesmos no vetor.*/
+		/*if(sessionStorage.getItem("users")){
+			users = JSON.parse(sessionStorage.getItem("users"));
+		}*/
+		if(localStorage.getItem("users")){
+			users = JSON.parse(localStorage.getItem("users"));
+		}
+		return users;
+	}
+
+	selectAll(){
+		let users = this.getUsersStorage();
+		users.forEach(dataUser=>{
+			let user = new User();
+			user.loadFromJSON(dataUser);
+			this.addLine(user);
+		});
+	}
+
+	insert(data){
+		let users = this.getUsersStorage();
+		users.push(data);
+		/*Armazena uma informação na sessão do navegador,
+		  tornando-a disponível enquanto o usuário navegar
+		  pelo site.Parâmetros são CHAVE e VALOR.*/ 
+		//sessionStorage.setItem("users",JSON.stringify(users));
+		/*Armazena a informação no navegador, tornando-a
+		  disponível até o usuário apagar o cache do mesmo.
+		  CUIDADO: A infomação NÃO é encriptada.*/
+		localStorage.setItem("users",JSON.stringify(users)); 
 	}
 
 	addLine(dataUser){

@@ -50,4 +50,18 @@ class User{
 	get register(){
 		return this._register;
 	}
+
+	loadFromJSON(json){
+		for(name in json){
+			switch(name){
+				case '_register':
+					//Cria uma instância de Date a partir da chave do JSON 
+					this[name] = new Date(json[name]);
+				break;
+				default:
+					//Exemplo: this[_email] = json[_email]
+					this[name] = json[name];
+			}
+		}
+	}
 }
