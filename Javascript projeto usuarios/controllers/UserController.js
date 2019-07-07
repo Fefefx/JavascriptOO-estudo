@@ -40,21 +40,9 @@ class UserController{
 					}else{
 						result._photo = content;
 					}
-					/*Sobrescreve o DataSet user da linha com os valores
-					  digitados no formulário de update.*/
-					tr.dataset.user = JSON.stringify(result);
-					tr.innerHTML = `<tr>
-                	<td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                	<td>${result._name}</td>
-                	<td>${result._email}</td>
-                	<td>${(result._admin)?'Sim':'Não'}</td>
-                	<td>${Utils.dateFormat(result._register)}</td>
-                	<td>
-                	<button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                	<button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
-                	</td>
-                	</tr>`;
-            		this.addEventsTr(tr);
+					let user = new User();
+					user.loadFromJSON(result);
+					this.getTr(user,tr); 
             		this.updateCount();
 					this.formUpdateEl.reset();
 					btn.disabled = false;
@@ -208,7 +196,18 @@ class UserController{
 	}
 
 	addLine(dataUser){
-		let tr = document.createElement("tr");
+		let tr = this.getTr(dataUser);		     
+        //Adiciona um elemento filho a outro sem substituir o conteúdo já existente.
+        this.tableEl.appendChild(tr);
+        this.updateCount();
+	}
+
+	/*Define o valor padrão de tr como sendo null,
+	  tornando a sua utilização facultativa, de modo que 
+	  não sou obrigado a passar esse parâmetro.*/
+	getTr(dataUser, tr = null){
+		//Se não existir a linha cria uma.
+		if(tr===null) tr = document.createElement("tr");
 		/* A API dataset permite recuperar um valor como um objeto 
 		   e o método stringify converte seu conteúdo para String JSON,
 		   em um processo conhecido como Serialização. */
@@ -225,9 +224,7 @@ class UserController{
                     </td>
                   </tr>`;
         this.addEventsTr(tr);
-        //Adiciona um elemento filho a outro sem substituir o conteúdo já existente.
-        this.tableEl.appendChild(tr);
-        this.updateCount();
+        return tr;		
 	}
 
 	addEventsTr(tr){
