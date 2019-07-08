@@ -161,21 +161,8 @@ class UserController{
 			user.admin);
 	}
 
-	getUsersStorage(){
-		let users = [];
-		/*Se existir uma string com os dados dos usuários
-		  carrega os mesmos no vetor.*/
-		/*if(sessionStorage.getItem("users")){
-			users = JSON.parse(sessionStorage.getItem("users"));
-		}*/
-		if(localStorage.getItem("users")){
-			users = JSON.parse(localStorage.getItem("users"));
-		}
-		return users;
-	}
-
 	selectAll(){
-		let users = this.getUsersStorage();
+		let users = User.getUsersStorage();
 		users.forEach(dataUser=>{
 			let user = new User();
 			user.loadFromJSON(dataUser);
@@ -220,6 +207,9 @@ class UserController{
 		tr.querySelector(".btn-delete").addEventListener("click",e=>{
 			//Abre uma janela de confirmação e retorna um booleano.
 			if(confirm("Deseja realmente excluir ?")){
+				let user = new User();
+				user.loadFromJSON(JSON.parse(tr.dataset.user));
+				user.remove();
 				//Remove a linha da tabela.
 				tr.remove();
 				this.updateCount();

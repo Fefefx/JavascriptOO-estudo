@@ -84,11 +84,13 @@ class User{
 	}
 
 	getNewID(){
+		let usersID = parseInt(localStorage.getItem("usersID"));
 		/*Verifica se existe o atributo id no escopo da aplicação.
 		  Caso não exista, define esse atributo iniciando de 0.*/
-		if(!window.id) window.id = 0;
-		id++;
-		return id;
+		if(!usersID) usersID = 0;
+		usersID++;
+		localStorage.setItem("usersID",usersID);
+		return usersID;
 	}
 
 	save(){
@@ -114,6 +116,22 @@ class User{
 			  disponível até o usuário apagar o cache do mesmo.
 			  CUIDADO: A infomação NÃO é encriptada.*/
 		}
+		localStorage.setItem("users",JSON.stringify(users)); 
+	}
+
+	remove(){
+		let users = User.getUsersStorage();
+		/*Varre registro por registro dos usuários,
+		  até encontrar no localStorage o usuário que
+		  pretende-se remover.*/
+		users.forEach((userData,index)=>{
+			if(this._id == userData._id){
+				/*A partir de uma determinada posição
+				  remove uma quantidade específica de
+				  elementos do vetor.*/
+				users.splice(index,1);
+			}
+		});
 		localStorage.setItem("users",JSON.stringify(users)); 
 	}
 
