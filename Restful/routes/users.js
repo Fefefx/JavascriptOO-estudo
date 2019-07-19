@@ -13,8 +13,10 @@ let db = new NeDB({
 });
 
 module.exports = app =>{
+	//Define a rota como /users
+	let route = app.route('/users');
 	//Resposta para a rota /users usando do método get
-	app.get('/users',(req,res)=>{
+	route.get((req,res)=>{
 		/*Find pesquisa objetos no banco. Quando vazio retorna 
 		  todos os dados armazenados.Sort define por qual chave
 		  os mesmos serão ordenados, para ordenar de maneira
@@ -23,10 +25,7 @@ module.exports = app =>{
 		  solicitação.*/
 		db.find({}).sort({name:1}).exec((err,users)=>{
 			if(err){
-				console.log(`error: ${err}`);
-				res.status(400).json({
-					error: err
-				});
+				app.utils.send(err,req,res);
 			}else{
 				res.statusCode = 200;
 				//Define o tipo da resposta como sendo um json.
@@ -46,7 +45,7 @@ module.exports = app =>{
 
 	});
 	//Resposta para a rota /users usando do método post
-	app.post('/users',(req,res)=>{
+	route.post((req,res)=>{
 		/*A propriedade body armazena os campos que
 		  foram enviados na requisição.*/
 		//res.json(req.body);
@@ -55,15 +54,35 @@ module.exports = app =>{
 		db.insert(req.body,(err,user)=>{
 			//Verifica a existência do erro
 			if(err){
-				console.log(`error: ${err}`);
-				/*Indica que houve erro ao processar a solicitação
-				  e devolve um JSON.*/
-				res.status(400).json({
-					error: err
-				});
+				app.utils.send(err,req,res);
 			}else{
 				res.status(200).json(user);
 			}
 		});
 	});
+	//Define a rota para quando o arquivo receber um parâmetro id
+	let routeID = app.route('/users/:id');
+	routeID.get((req,res)=>{
+		/*Localiza o primeiro registro que tenha o id igual
+		  ao parâmetro recebido.*/
+		db.findOne({_id:req.params.id}).exec((err,user)=>{
+			if(err){
+				app.utils.send(err,req,res);
+			}else{
+				res.status(200).json(user);
+			}
+		});
+	});
+	//O método Put é usado para atualizar um objeto
+	routeID.put((req,res)=>{
+		/*Localiza o primeiro registro que tenha o id igual
+		  ao parâmetro recebido e atualiza os seus dados*/
+		db.update({_id:req.params.id},req.body,err=>{
+			if(err){
+				app.utils.send(err,req,res);
+			}else{
+				res.status(200).json(Object.assign(req.params,req.body));
+			}
+		});
+	});	
 }

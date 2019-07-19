@@ -21,9 +21,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
   devem ser do tipo JSON.*/
 app.use(bodyParser.json());
 
-/*Inclua todas as rotas da pasta routes em
+/*Inclua todas as rotas das pastas routes e utils em
   app, responsável por representar o servidor.*/
-consign().include('routes').into(app);
+consign().include('routes').include('utils').into(app);
 
 //Especifica que o servidor deve usar as seguintes rotas
 //app.use(routesIndex);
