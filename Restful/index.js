@@ -3,6 +3,7 @@
 const express = require('express');
 const consign = require('consign');
 const bodyParser = require('body-parser');
+const expressValidator = require('express-validator');
 
 /*Exporta o arquivo index dentro da pasta routes
   Como referencio uma pasta do meu projeto preciso
@@ -20,6 +21,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
   POST ao express, indicando que as respostas 
   devem ser do tipo JSON.*/
 app.use(bodyParser.json());
+
+//Adiciona o módulo de validação de dados
+app.use(expressValidator());
 
 /*Inclua todas as rotas das pastas routes e utils em
   app, responsável por representar o servidor.*/
