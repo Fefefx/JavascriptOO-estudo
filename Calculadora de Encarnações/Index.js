@@ -1,0 +1,1 @@
+let controller = new EncarnationController('form-id','name','birth','answer');
